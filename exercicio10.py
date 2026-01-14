@@ -44,7 +44,7 @@ computador = 0
 historico = []
 winnerJogador = 0
 winnerComputador = 0
-
+partida = 0
 while True:
     option = startingProgram()
 
@@ -57,11 +57,30 @@ while True:
         while True:
             # Verifica se alguém perdeu e adiciona a vitória
             if lifezero():
+                #Adiciona a partina no histórico vitória do computador
+
+
                 if jogador == 0:
                     winnerComputador += 1
+                    partida +=1
+                    computadorWin = "A vitória foi do Computador!"
+                    register = {
+                    "partida" : partida,
+                    "winnerRoud" : computadorWin
+                    }
+                    historico.append(register)
                     break
+                
+                #Adiciona a partina no histórico vitória do jogador
                 elif computador == 0:
                     winnerJogador += 1
+                    partida +=1
+                    jogadorWin = "A vitória foi do Jogador!"
+                    register = {
+                    "partida" : partida,
+                    "winnerRoud" : jogadorWin
+                    }
+                    historico.append(register)
                     break
                 break
             
@@ -98,12 +117,15 @@ while True:
         print("Prograna encerrado")
         break
     elif option == "2":
-        print(f"Jogador ganhou {winnerJogador} e perdeu {winnerComputador} vezes!")
-        if winnerComputador > winnerJogador:
-            print("Você não esta com sorte hoje em...")
-        elif winnerComputador < winnerJogador:
-            print("Parece que você esta na lidernaça! Parabéns")
+        if len(historico) == 0:
+            print("Não há registros!\n")
         else:
-            print("Pelo jeito as coisas estão acirradas!!!")
+            print("\n---- Histórico de Partidas ----")
+            print(f"Foram ao todo {partida} partidas.")
+            for registred in range(len(historico)):
+                print(f"Partida n°{registred+1}.")
+                print(f"{historico[registred]['winnerRoud']}") 
+
+
     else:
         print("Comando Inválido, tente novamente!")
