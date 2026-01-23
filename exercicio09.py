@@ -4,6 +4,7 @@
 #função para opções
 
 import json
+from datetime import datetime 
 
 # Função para salvar contatos no arquivo JSON
 def salvar_contatos(lista_contatos):
@@ -32,7 +33,7 @@ def startingProgram():
     print("[3] Buscar")
     print("[4] Ver total de contatos salvos")
     print("[5] Editar contato")
-    print("[6] Sair")
+    print("[0] Sair")
     selectOption = input("Escolha uma opção:\n")
     return selectOption
 # Função para registro de nome e cidade
@@ -78,17 +79,19 @@ while True:
         name = registerLetters(1)
         number = registerNumber()
         city = registerLetters(2)
+    
+        # Pegar data e hora atual
+        agora = datetime.now()
+        data_cadastro = agora.strftime("%d/%m/%Y às %H:%M:%S")
 
-        # Criando dicionário com as informações do contato
         person = {
             "nome": name,
             "telefone": number,
-            "cidade": city
+            "cidade": city,
+            "cadastrado_em": data_cadastro  # ← NOVA LINHA
         }
         register.append(person)
-        print(f"Contato '{name}' adicionado!")
-        
-        # SALVAR AUTOMATICAMENTE APÓS ADICIONAR
+        print(f"Contato '{name}' adicionado em {data_cadastro}!")
         salvar_contatos(register)
 #Para ver todos os contatos na lista
     elif option == "2":
@@ -101,6 +104,7 @@ while True:
                 print(f"  Nome: {pessoa['nome']}")
                 print(f"  Telefone: {pessoa['telefone']}")
                 print(f"  Cidade: {pessoa['cidade']}")
+                print(f"  Cadastrado em: {pessoa.get('cadastrado_em', 'Não registrado')}") 
                 print("-" * 30)
 #Procurar contato específio na lista
     elif option == "3":
@@ -117,6 +121,9 @@ while True:
                     print(f"  Nome: {pessoa['nome']}")
                     print(f"  Telefone: {pessoa['telefone']}")
                     print(f"  Cidade: {pessoa['cidade']}")
+                    print(f"  Cadastrado em: {pessoa.get('cadastrado_em', 'Não registrado')}")  
+                    if 'ultima_edicao' in pessoa:
+                        print(f"  Última edição: {pessoa['ultima_edicao']}")
                     print("-" * 30)
             else:
                 print(f"\nNenhum contato encontrado com '{search}'\n")
@@ -133,34 +140,61 @@ while True:
             
             if resultados:
                 print(f"\nEncontrado(s) {len(resultados)} contato(s):\n")
+
+                # Mostrar todos os resultados
                 for i, pessoa in enumerate(resultados, 1):
                     print(f"{i}.")
                     print(f"  Nome: {pessoa['nome']}")
                     print(f"  Telefone: {pessoa['telefone']}")
                     print(f"  Cidade: {pessoa['cidade']}")
                     print("-" * 30)
-                    print("Digite [1] para alterar número")
-                    print("Digíte [2] para alterar a cidade")
+
+                # Caso haja mais de 1, escolha de qual editar
+                if len(resultados) > 1:
                     while True:
-                        escolhaAlterar = input("Escolha uma opção:\n")
-                        if escolhaAlterar == "1":   
-                            print("Digíte o novo Telefone")                     
-                            novoNumero = registerNumber()
-                            pessoa["telefone"] = novoNumero
-                            print(f"Contato '{pessoa['nome']}' teve o teledone alterado para {novoNumero}!")
-                            break
-                        elif escolhaAlterar == "2":
-                            novaCidade = registerLetters(2)
-                            pessoa["cidade"] = novaCidade
-                            print(f"Contato '{pessoa['nome']}' teve a cidade alterada para {novaCidade}!")
-                            break
-                        else:
-                            print("Comando Inválido, tente novamente!")
+                        try:
+                            escolha_pessoa = int(input(f"Qual contato deseja editar? (1-{len(resultados)}): "))
+                            if 1 <= escolha_pessoa <= len(resultados):
+                                pessoa_selecionada = resultados[escolha_pessoa - 1]
+                                break
+                            else:
+                                print(f"Digite um número entre 1 e {len(resultados)}")
+                        except ValueError:
+                            print("Digite apenas números!")
+                else:
+                    # Se houver apenas um resultado
+                    pessoa_selecionada = resultados[0]
+
+
+                print("Digite [1] para alterar número")
+                print("Digíte [2] para alterar a cidade")
+                while True:
+                    escolhaAlterar = input("Escolha uma opção:\n")
+                    if escolhaAlterar == "1":   
+                        print("Digite o novo Telefone")                     
+                        novoNumero = registerNumber()
+                        pessoa["telefone"] = novoNumero       
+                        print(f"Contato '{pessoa['nome']}' teve o telefone alterado para {novoNumero}!")
+                        break
+
+                    elif escolhaAlterar == "2":
+                        novaCidade = registerLetters(2)
+                        pessoa["cidade"] = novaCidade
+                        print(f"Contato '{pessoa['nome']}' teve a cidade alterada para {novaCidade}!")
+                        break
+
+                    else:
+                        print("Comando Inválido, tente novamente!")
+
+                # Adicionar timestamp e salvar
+                agora = datetime.now()
+                pessoa["ultima_edicao"] = agora.strftime("%d/%m/%Y às %H:%M:%S")
+                salvar_contatos(register)
             else:
                 print(f"\nNenhum contato encontrado com '{search}'\n")
 
 #Encerramento do programa    
-    elif option == "6":
+    elif option == "0":
         print("Programa encerrado!")
         break
 #Para comando que não pentence as opções
