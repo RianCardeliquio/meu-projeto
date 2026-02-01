@@ -3,6 +3,7 @@ import random
 def startingProgram():
     print("Pressiona 0 para encerrar jogo")
     print("Pressione 1 para jogar novamente")
+    print("Pressione 2 para ver o histórico")
     selectOptionm = input("Escolha uma opção:\n")
     return selectOptionm
 
@@ -40,6 +41,10 @@ print("• O jogo termina quando alguém ficar sem vidas")
 
 jogador = 0
 computador = 0
+historico = []
+winnerJogador = 0
+winnerComputador = 0
+partida = 0
 
 while True:
     option = startingProgram()
@@ -51,10 +56,30 @@ while True:
         print(f" Vidas do Computador: {computador}")
 
         while True:
-            # Verifica se alguém perdeu
+            # Verifica se alguém perdeu e adiciona a vitória
             if lifezero():
-                break
-            
+                if jogador == 0:
+                    winnerComputador += 1
+                    partida += 1
+                    computadorWin = "A vitória foi do Computador!"
+                    register = {
+                        "partida": partida,
+                        "winnerRoud": computadorWin
+                    }
+                    historico.append(register)
+                    break
+
+                elif computador == 0:
+                    winnerJogador += 1
+                    partida += 1
+                    jogadorWin = "A vitória foi do Jogador!"
+                    register = {
+                        "partida": partida,
+                        "winnerRoud": jogadorWin
+                    }
+                    historico.append(register)
+                    break
+
             while True:
                 rondContinue = input("\nPressione ENTER para comprar cartas: ")
                 if rondContinue != "":
@@ -85,7 +110,18 @@ while True:
                 print(f" Vidas do Computador: {computador}")
 
     elif option == "0":
-        print("Prograna encerrado")
+        print("Programa encerrado")
         break
+
+    elif option == "2":
+        if len(historico) == 0:
+            print("Não há registros!\n")
+        else:
+            print("\n---- Histórico de Partidas ----")
+            print(f"Foram ao todo {partida} partidas.")
+            for registred in range(len(historico)):
+                print(f"Partida n°{registred+1}.")
+                print(f"{historico[registred]['winnerRoud']}")
+
     else:
         print("Comando Inválido, tente novamente!")
